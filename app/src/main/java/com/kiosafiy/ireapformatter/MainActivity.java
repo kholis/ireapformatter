@@ -22,6 +22,9 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
     //FloatingActionButton fab;
@@ -32,8 +35,8 @@ public class MainActivity extends AppCompatActivity {
     EditText editText, etOngkir, etCatatan, edNamaDropshipper, edTelpDropshipper;
     Button btnCopy, btnShare;
     String namaEkspedisi, ongkir, catatan;
-    String namaToko = "Kios Afiy";
-    String noTelpon = "08989225632";
+    String namaToko;
+    String noTelpon;
     Spinner spEkspedisi;
 
 
@@ -168,16 +171,39 @@ public class MainActivity extends AppCompatActivity {
         if (Intent.ACTION_SEND.equals(action) && type != null) {
             if (type.startsWith("text/")) {
                 String a = intent.getStringExtra(Intent.EXTRA_TEXT);
+                String totalAmount = "";
                 //Toast.makeText(this, uri.toString(), Toast.LENGTH_LONG).show();
                 if (a != null) {
-                    // Update UI to reflect text being shared
-                    a = a.replace("Store\n", "");
-                    //a = a.replaceall("===\n0", "");
-                    a = a.replace("Tax:  0\n", "");
+                    // Get Total Amount
+                    // https://stackoverflow.com/questions/32672371/finding-words-within-a-string-in-java
+                    Pattern p = Pattern.compile("Total Amount");
+
+                    Scanner scanner = new Scanner(a);
+                    while (scanner.hasNextLine()) {
+                        String line = scanner.nextLine();
+                        Matcher m = p.matcher(line);
+                        if (m.find()) {
+                            String[] split = line.split("\\s+");
+                            totalAmount = split[3].replace(",","");
+                        }
+                    }
+
+                    Integer grantTotal = Integer.parseInt(totalAmount) + Integer.parseInt(ongkir);
+
+                    Log.e("invoice", namaToko + " | " + noTelpon);
+                    // Replace string
+                    a = a.replaceAll("Store [0-9]+\n", "Dari: " + namaToko + "\nHP: " + noTelpon + "\n");
+                    a = a.replaceAll("Date: [0-9:\\-\\ ]+\n", "");
+                    a = a.replaceAll("Sales No: S[0-9]+\n","");
+                    a = a.replace("Customer", "Kepada");
+                    a = a.replace("Indonesia\n", "");
+                    a = a.replace("Tax:  0\n", "Ongkir: " + String.format("%,d", Integer.parseInt(ongkir)) + "\n");
+                    a = a.replaceAll("Payment \\(Cash\\):[A-Z0-9,:\\ ]+\n", "GRANT TOTAL: Rp " + String.format("%,d", grantTotal));
                     a = a.replace("Change:  IDR 0\n", "");
+                    a = a.replace("IDR", "Rp");
                     a = a.replace("\nPowered by iReap POS Lite", "");
                     editText = (EditText) findViewById(R.id.editText);
-                    editText.setText(a + "\nOngkir: " + ongkir + "\nNotes: " + namaEkspedisi);
+                    editText.setText(a + "\nEkspedisi: " + namaEkspedisi + "\nNotes: " + catatan);
                 }
             }
         }
@@ -280,7 +306,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // https://www.codepolitan.com/membuat-custom-alert-dialog-di-android-studio-5a9620bb20e59
-    private void dialogForm() {
+    public void dialogForm() {
         dialog = new AlertDialog.Builder(MainActivity.this);
         inflater = getLayoutInflater();
         dialogView = inflater.inflate(R.layout.form_invoice, null);
@@ -296,6 +322,7 @@ public class MainActivity extends AppCompatActivity {
         edTelpDropshipper = (EditText) dialogView.findViewById(R.id.edTelpDropshipper);
 
         // Spinner Ekspedisi
+        // https://stackoverflow.com/questions/13377361/how-to-create-a-drop-down-list
         String[] items = new String[]{"JNE", "JNT", "TIKI", "POS", "GOJEK", "GRAB", "WAHANA", "SiCepat", "NinjaExpress"};
         spEkspedisi = (Spinner) dialogView.findViewById(R.id.spEkspedisi);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
@@ -309,14 +336,21 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 ongkir = etOngkir.getText().toString();
                 catatan = etCatatan.getText().toString();
-                if (edNamaDropshipper.getText().toString() != null) {
-                    namaToko = edNamaDropshipper.getText().toString();
+                namaToko = "Kios Afiy";
+                noTelpon = "08989225632";
+
+                String tmpNamaToko = edNamaDropshipper.getText().toString();
+                String tmpNoTelp = edTelpDropshipper.getText().toString();
+                Log.e("DROPSHIP", tmpNamaToko + " | " + tmpNoTelp);
+                if (tmpNamaToko.length() != 0) {
+                    namaToko = tmpNamaToko;
                 }
 
-                if (edTelpDropshipper.getText().toString() != null) {
-                    noTelpon = edTelpDropshipper.getText().toString();
+                if (tmpNoTelp.length() != 0) {
+                    noTelpon = tmpNoTelp;
                 }
 
+                Log.e("DROPSHIP", namaToko + " | " + noTelpon);
                 namaEkspedisi = String.valueOf(spEkspedisi.getSelectedItem());
 
                 //editText.setText("Ongkir : " + ongkir + "\n" + "Catatan : " + catatan);
