@@ -177,7 +177,6 @@ public class MainActivity extends AppCompatActivity {
                     // Get Total Amount
                     // https://stackoverflow.com/questions/32672371/finding-words-within-a-string-in-java
                     Pattern p = Pattern.compile("Total Amount");
-
                     Scanner scanner = new Scanner(a);
                     while (scanner.hasNextLine()) {
                         String line = scanner.nextLine();
@@ -187,12 +186,10 @@ public class MainActivity extends AppCompatActivity {
                             totalAmount = split[3].replace(",","");
                         }
                     }
-
                     Integer grantTotal = Integer.parseInt(totalAmount) + Integer.parseInt(ongkir);
 
-                    Log.e("invoice", namaToko + " | " + noTelpon);
                     // Replace string
-                    a = a.replaceAll("Store [0-9]+\n", "Dari: " + namaToko + "\nHP: " + noTelpon + "\n");
+                    a = a.replaceAll("Store [0-9]+\n", "");
                     a = a.replaceAll("Date: [0-9:\\-\\ ]+\n", "");
                     a = a.replaceAll("Sales No: S[0-9]+\n","");
                     a = a.replace("Customer", "Kepada");
@@ -203,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
                     a = a.replace("IDR", "Rp");
                     a = a.replace("\nPowered by iReap POS Lite", "");
                     editText = (EditText) findViewById(R.id.editText);
-                    editText.setText(a + "\nEkspedisi: " + namaEkspedisi + "\nNotes: " + catatan);
+                    editText.setText("Dari: " + namaToko + "\nHP: " + noTelpon + "\n" + a + "\nEkspedisi: " + namaEkspedisi + "\nNotes: " + catatan);
                 }
             }
         }
@@ -341,7 +338,6 @@ public class MainActivity extends AppCompatActivity {
 
                 String tmpNamaToko = edNamaDropshipper.getText().toString();
                 String tmpNoTelp = edTelpDropshipper.getText().toString();
-                Log.e("DROPSHIP", tmpNamaToko + " | " + tmpNoTelp);
                 if (tmpNamaToko.length() != 0) {
                     namaToko = tmpNamaToko;
                 }
@@ -350,7 +346,6 @@ public class MainActivity extends AppCompatActivity {
                     noTelpon = tmpNoTelp;
                 }
 
-                Log.e("DROPSHIP", namaToko + " | " + noTelpon);
                 namaEkspedisi = String.valueOf(spEkspedisi.getSelectedItem());
 
                 //editText.setText("Ongkir : " + ongkir + "\n" + "Catatan : " + catatan);
