@@ -1,4 +1,31 @@
 <resources>
     <string name="app_name">iReap Formatter</string>
     <string name="send_to">Kirim ke:</string>
+    <string-array name="list_ekspedisi">
+        <item>JNE</item>
+        <item>TIKI</item>
+        <item>JNT</item>
+        <item>POS</item>
+        <item>GOJEK</item>
+        <item>GRAB</item>
+        <item>WAHANA</item>
+        <item>SiCepat</item>
+        <item>NinjaExpress</item>
+    </string-array>
+    <string-array name="list_bank">
+        <item>Mandiri</item>
+        <item>BCA</item>
+        <item>BSM</item>
+        <item>BNI</item>
+        <item>BRI</item>
+    </string-array>
+    <string-array name="list_ordervia">
+        <item>Instagram</item>
+        <item>Shopee</item>
+        <item>Tokopedia</item>
+        <item>Facebook</item>
+        <item>LINE</item>
+        <item>WhatsApp</item>
+        <item>Telegram</item>
+    </string-array>
 </resources>

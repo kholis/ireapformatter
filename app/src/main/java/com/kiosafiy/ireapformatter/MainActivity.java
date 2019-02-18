@@ -12,8 +12,10 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.FileNotFoundException;
@@ -27,9 +29,12 @@ public class MainActivity extends AppCompatActivity {
     AlertDialog.Builder dialog;
     LayoutInflater inflater;
     View dialogView;
-    EditText editText, etOngkir, etCatatan;
+    EditText editText, etOngkir, etCatatan, edNamaDropshipper, edTelpDropshipper;
     Button btnCopy, btnShare;
-    String ongkir, catatan;
+    String namaEkspedisi, ongkir, catatan;
+    String namaToko = "Kios Afiy";
+    String noTelpon = "08989225632";
+    Spinner spEkspedisi;
 
 
     @Override
@@ -172,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
                     a = a.replace("Change:  IDR 0\n", "");
                     a = a.replace("\nPowered by iReap POS Lite", "");
                     editText = (EditText) findViewById(R.id.editText);
-                    editText.setText(a + "\nOngkir: " + ongkir + "\nNotes: " + catatan);
+                    editText.setText(a + "\nOngkir: " + ongkir + "\nNotes: " + namaEkspedisi);
                 }
             }
         }
@@ -258,11 +263,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 switch (which) {
-                    case 0: // horse
+                    case 0: // Format Invoice
                         dialogForm();
                         //tanganiIntent();
                         break;
-                    case 1: // cow
+                    case 1: // Format Stock
                         tanganiIntent();
                         break;
                 }
@@ -282,14 +287,21 @@ public class MainActivity extends AppCompatActivity {
         dialog.setView(dialogView);
         dialog.setCancelable(true);
         //dialog.setIcon(R.mipmap.ic_launcher);
-        dialog.setTitle("Tambahan Invoice:");
+        dialog.setTitle("     Tambahan Info Invoice:");
 
         editText = (EditText)findViewById(R.id.editText);
         etOngkir = (EditText) dialogView.findViewById(R.id.etOngkir);
         etCatatan = (EditText) dialogView.findViewById(R.id.etCatatan);
+        edNamaDropshipper = (EditText) dialogView.findViewById(R.id.edNamaDropshipper);
+        edTelpDropshipper = (EditText) dialogView.findViewById(R.id.edTelpDropshipper);
 
-        //etOngkir.setText(null);
-        //etCatatan.setText(null);
+        // Spinner Ekspedisi
+        String[] items = new String[]{"JNE", "JNT", "TIKI", "POS", "GOJEK", "GRAB", "WAHANA", "SiCepat", "NinjaExpress"};
+        spEkspedisi = (Spinner) dialogView.findViewById(R.id.spEkspedisi);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, items);
+        spEkspedisi.setAdapter(adapter);
+        namaEkspedisi = String.valueOf(spEkspedisi.getSelectedItem());
+
 
         dialog.setPositiveButton("Proses", new DialogInterface.OnClickListener() {
 
@@ -297,6 +309,15 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 ongkir = etOngkir.getText().toString();
                 catatan = etCatatan.getText().toString();
+                if (edNamaDropshipper.getText().toString() != null) {
+                    namaToko = edNamaDropshipper.getText().toString();
+                }
+
+                if (edTelpDropshipper.getText().toString() != null) {
+                    noTelpon = edTelpDropshipper.getText().toString();
+                }
+
+                namaEkspedisi = String.valueOf(spEkspedisi.getSelectedItem());
 
                 //editText.setText("Ongkir : " + ongkir + "\n" + "Catatan : " + catatan);
                 dialog.dismiss();
