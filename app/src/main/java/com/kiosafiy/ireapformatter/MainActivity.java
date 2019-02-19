@@ -172,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
             if (type.startsWith("text/")) {
                 String a = intent.getStringExtra(Intent.EXTRA_TEXT);
                 String totalAmount = "";
+                String totalQuantity;
                 //Toast.makeText(this, uri.toString(), Toast.LENGTH_LONG).show();
                 if (a != null) {
                     // Get Total Amount
@@ -186,7 +187,11 @@ public class MainActivity extends AppCompatActivity {
                             totalAmount = split[3].replace(",","");
                         }
                     }
-                    Integer grantTotal = Integer.parseInt(totalAmount) + Integer.parseInt(ongkir);
+
+                    Integer grandTotal = Integer.parseInt(totalAmount) + Integer.parseInt(ongkir);
+
+                    totalQuantity = grep("Total Quantity", a);
+                    totalQuantity = totalQuantity.replace("Total Quantity", "Jumlah Barang");
 
                     // Replace string
                     a = a.replaceAll("Store [0-9]+\n", "");
@@ -194,13 +199,16 @@ public class MainActivity extends AppCompatActivity {
                     a = a.replaceAll("Sales No: S[0-9]+\n","");
                     a = a.replace("Customer", "Kepada");
                     a = a.replace("Indonesia\n", "");
-                    a = a.replace("Tax:  0\n", "Ongkir: " + String.format("%,d", Integer.parseInt(ongkir)) + "\n");
-                    a = a.replaceAll("Payment \\(Cash\\):[A-Z0-9,:\\ ]+\n", "GRANT TOTAL: Rp " + String.format("%,d", grantTotal));
+                    a = a.replace("Tax:  0\n", "");
+                    a = a.replaceAll("Total Quantity:  [0-9]+\n", "Ongkir: " + String.format("%,d", Integer.parseInt(ongkir)) + "\n");
+                    a = a.replaceAll("Payment \\(Cash\\):[A-Z0-9,:\\ ]+\n", "GRAND TOTAL: Rp " + String.format("%,d", grandTotal));
                     a = a.replace("Change:  IDR 0\n", "");
                     a = a.replace("IDR", "Rp");
                     a = a.replace("\nPowered by iReap POS Lite", "");
                     editText = (EditText) findViewById(R.id.editText);
-                    editText.setText("Dari: " + namaToko + "\nHP: " + noTelpon + "\n" + a + "\nEkspedisi: " + namaEkspedisi + "\nNotes: " + catatan);
+                    editText.setText("Dari: " + namaToko + "\nHP: " + noTelpon + a
+                            + "\n" + totalQuantity
+                            + "\nEkspedisi: " + namaEkspedisi + "\nNotes: " + catatan);
                 }
             }
         }
@@ -381,5 +389,19 @@ public class MainActivity extends AppCompatActivity {
         sendIntent.putExtra(Intent.EXTRA_TEXT, editText.getText());
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.send_to)));
+    }
+
+    public String grep(String keyword, String mainText) {
+        String result = "";
+        Pattern p = Pattern.compile(keyword);
+        Scanner scanner = new Scanner(mainText);
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            Matcher m = p.matcher(line);
+            if (m.find()) {
+                result = line;
+            }
+        }
+        return result;
     }
 }
